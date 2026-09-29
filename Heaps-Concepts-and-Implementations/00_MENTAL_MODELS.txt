@@ -1,0 +1,157 @@
+HEAPS - MENTAL MODELS ONLY
+==========================
+
+BASE HEAP
+Complete tree in array. Root = current extreme.
+INSERT: next empty position -> bubble UP.
+DELETE ROOT: last -> root -> heapify DOWN.
+
+01. Min / Max Heap Basics
+Heap = complete tree; root keeps the current extreme.
+   Root is the extreme; children obey heap rule.
+   ↓
+   HEAP ROOT = best current candidate
+
+02. Heap Insertion
+New item takes next empty seat, then bubbles UP.
+   Insert = end, then UP.
+   ↓
+   HEAP ROOT = best current candidate
+
+03. Delete Heap Root
+Last item fills root hole, then moves DOWN.
+   Delete root = last to root, then DOWN.
+   ↓
+   HEAP ROOT = best current candidate
+
+04. Heapify
+Fix one wrong parent by pushing it DOWN one path.
+   Heapify = choose best child and go DOWN.
+   ↓
+   HEAP ROOT = best current candidate
+
+05. Build Heap
+Leaves are already heaps; fix parents bottom-up.
+   Build heap = fix parents bottom-up.
+   ↓
+   HEAP ROOT = best current candidate
+
+06. Convert Min Heap to Max Heap
+Keep the same complete-tree shape; change the rule.
+   Min to Max = same tree, opposite comparison.
+   ↓
+   HEAP ROOT = best current candidate
+
+07. Top K Largest
+Keep K winner chairs; root is weakest winner.
+   K largest = Min Heap of K winners.
+   ↓
+   HEAP ROOT = best current candidate
+
+08. Kth Largest
+Keep K largest; smallest winner is rank K.
+   Kth largest = weakest Top-K winner.
+   ↓
+   HEAP ROOT = best current candidate
+
+09. Top K Smallest
+Keep K smallest; root is worst/largest winner.
+   K smallest = Max Heap of K winners.
+   ↓
+   HEAP ROOT = best current candidate
+
+10. Sort K-Sorted Array
+Correct next value must be among next K+1 candidates.
+   K-sorted = look at K+1, pop smallest.
+   ↓
+   HEAP ROOT = best current candidate
+
+11. Merge K Sorted Lists
+Each list offers only its current head.
+   Pop smallest head; expose next from same list.
+   ↓
+   HEAP ROOT = best current candidate
+
+12. Replace Elements by Rank
+Process values from smallest to largest and assign ranks.
+   Smallest first -> assign ranks.
+   ↓
+   HEAP ROOT = best current candidate
+
+13. Task Scheduler
+Cooldown says READY? Frequency says WHO next?
+   Cooldown decides ready; Max Heap picks most remaining.
+   ↓
+   HEAP ROOT = best current candidate
+
+14. Hand of Straights
+Always start a group from the smallest remaining card.
+   Smallest remaining card starts every group.
+   ↓
+   HEAP ROOT = best current candidate
+
+15. Design Twitter
+Each user offers newest tweet; after pop, expose that user’s next older tweet.
+   Newest tweet POP; expose next older from same user.
+   ↓
+   HEAP ROOT = best current candidate
+
+16. Median From Data Stream
+Split numbers into smaller half and bigger half; median sits at boundary.
+   Two halves; median lives at the roots.
+   ↓
+   HEAP ROOT = best current candidate
+
+17. Kth Largest in a Stream
+K winner chairs; root is weakest winner.
+   Keep K largest; root is Kth.
+   ↓
+   HEAP ROOT = best current candidate
+
+18. Last Stone Weight
+Repeatedly take two heaviest stones, smash, push leftover.
+   POP two largest, subtract, PUSH leftover.
+   ↓
+   HEAP ROOT = best current candidate
+
+19. K Closest Points
+Keep K closest chairs; farthest current winner sits at root.
+   K closest = kick out farthest winner.
+   ↓
+   HEAP ROOT = best current candidate
+
+20. Top K Frequent
+Count first; then keep K largest frequencies.
+   COUNT first; keep K strongest frequencies.
+   ↓
+   HEAP ROOT = best current candidate
+
+21. Minimum Cost to Connect Sticks
+Combine two smallest so reused combined cost stays small.
+   Two smallest + add cost + push sum.
+   ↓
+   HEAP ROOT = best current candidate
+
+22. Check Min Heap
+Every parent must be <= each existing child.
+   Every parent <= both children.
+   ↓
+   HEAP ROOT = best current candidate
+
+23. Maximum Sum Combination
+Start best+best; expose one-step-down pairs; heap picks best exposed sum.
+   Best pair -> expose neighbors -> heap picks next best.
+   ↓
+   HEAP ROOT = best current candidate
+
+24. Single-Threaded CPU
+Arrival decides AVAILABLE; shortest processing time decides NEXT.
+   Arrived? PUSH. Shortest? POP. Finish. Repeat.
+   ↓
+   HEAP ROOT = best current candidate
+
+25. IPO
+Capital unlocks projects; among affordable projects choose max profit.
+   Unlock affordable projects; take max profit.
+   ↓
+   HEAP ROOT = best current candidate

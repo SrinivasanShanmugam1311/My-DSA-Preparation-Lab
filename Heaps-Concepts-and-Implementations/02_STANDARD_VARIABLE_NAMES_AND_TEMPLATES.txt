@@ -1,0 +1,104 @@
+STANDARD VARIABLE NAMES + MODULAR TEMPLATE
+============================================
+
+GOAL
+----
+Open any heap problem months later and recognize the SAME vocabulary.
+
+COMMON NAMES — USE THESE EVERYWHERE
+-----------------------------------
+heap                  -> the heap / waiting room
+heap_size             -> number of items currently inside the heap
+current_value         -> value being processed now
+incoming_value        -> new value arriving now
+root_value            -> current min/max at the heap root
+answer                -> output / result being built
+number_of_winners     -> K for Top-K problems
+current_index         -> current array/heap position
+parent_index          -> parent position
+left_child_index      -> left child position
+right_child_index     -> right child position
+smallest_index        -> smallest of parent/children
+largest_index         -> largest of parent/children
+frequency             -> number of copies / occurrences
+remaining_frequency   -> copies still left
+current_time          -> simulated time now
+ready_time            -> when an item becomes available again
+original_index        -> original input position
+processing_time       -> time needed by a CPU task
+timestamp             -> tweet/event time
+current_capital       -> money/capital currently available
+project_profit        -> profit earned by a project
+required_capital      -> capital needed before a project is eligible
+
+SAME PYTHON HEAP API
+--------------------
+min_heap_push(heap, value)
+min_heap_pop(heap)
+min_heap_root(heap)
+min_heap_replace_root(heap, value)
+min_heap_build(values)
+
+max_heap_push(heap, value)
+max_heap_pop(heap)
+max_heap_root(heap)
+max_heap_build(values)
+
+heap_size(heap)
+heap_is_empty(heap)
+
+SAME C HEAP API
+---------------
+min_heap_push(heap, &heap_size, value)
+min_heap_pop(heap, &heap_size)
+min_heap_root(heap, heap_size)
+
+max_heap_push(heap, &heap_size, value)
+max_heap_pop(heap, &heap_size)
+max_heap_root(heap, heap_size)
+
+heap_is_empty(heap_size)
+
+UNIVERSAL APPLICATION TEMPLATE
+------------------------------
+1. Decide what candidates are eligible NOW.
+2. PUSH eligible candidates into heap.
+3. ROOT tells the best current candidate.
+4. POP when you want to consume that candidate.
+5. Update problem state.
+6. PUSH a new/replacement candidate if it becomes eligible.
+7. Repeat until answer is complete.
+
+TOP-K TEMPLATE
+--------------
+heap = []
+for incoming_value in values:
+    min_heap_push(heap, incoming_value)
+    if heap_size(heap) > number_of_winners:
+        min_heap_pop(heap)
+answer = min_heap_root(heap)
+
+REPEATED TWO-LARGEST TEMPLATE
+-----------------------------
+heap = max_heap_build(values)
+while heap_size(heap) > 1:
+    largest_value = max_heap_pop(heap)
+    second_largest_value = max_heap_pop(heap)
+    # update state
+    # maybe max_heap_push(heap, new_value)
+
+REPEATED TWO-SMALLEST TEMPLATE
+------------------------------
+heap = min_heap_build(values)
+while heap_size(heap) > 1:
+    smallest_value = min_heap_pop(heap)
+    second_smallest_value = min_heap_pop(heap)
+    # update state
+    # min_heap_push(heap, new_value)
+
+IMPORTANT
+---------
+Not every problem can use exactly the same problem-specific variables.
+For example, Twitter needs timestamp and user_id; CPU needs processing_time.
+But the HEAP vocabulary and HEAP function names stay the same.
+That is the reusable part you should memorize.

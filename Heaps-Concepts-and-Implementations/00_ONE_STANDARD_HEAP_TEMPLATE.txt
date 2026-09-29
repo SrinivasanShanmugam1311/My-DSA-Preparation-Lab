@@ -1,0 +1,37 @@
+ONE STANDARD HEAP TEMPLATE — USE THIS EVERYWHERE
+
+C FUNCTION NAMES
+----------------
+swap()
+min_push()
+min_pop()
+max_push()
+max_pop()
+
+Do NOT create alternate names such as min_heap_push(), push_min(), h/n/x versions, etc.
+
+STANDARD C VARIABLE NAMES
+-------------------------
+heap, size, value, index, parent, left, right, smallest, largest, answer
+
+MIN PUSH
+--------
+value enters at END -> compare with parent -> smaller moves UP
+
+MIN POP
+-------
+save smallest root -> last comes to root -> choose smaller child -> repair DOWN
+
+MAX PUSH
+--------
+value enters at END -> compare with parent -> larger moves UP
+
+MAX POP
+-------
+save largest root -> last comes to root -> choose larger child -> repair DOWN
+
+PYTHON
+------
+Use the same conceptual names:
+min_push(), min_pop(), max_push(), max_pop().
+Python heapq handles the internal repair.

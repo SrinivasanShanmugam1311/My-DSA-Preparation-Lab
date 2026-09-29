@@ -1,0 +1,30 @@
+CODE COMMENT STYLE USED IN THIS PACK
+===================================
+
+Bad learning comment:
+    // calculate parent
+
+Better learning comment:
+    // Find the parent because the new value may need to move UP.
+    int parent = (index - 1) / 2;
+
+Bad learning comment:
+    // break
+
+Better learning comment:
+    // Parent is already <= child, so the min-heap rule is correct. Stop moving up.
+    break;
+
+Bad learning comment:
+    // swap
+
+Better learning comment:
+    // Child is smaller than parent, so move the child UP toward the min-heap root.
+    swap(...);
+
+For every important step, ask:
+    1. WHAT does this line do?
+    2. WHY do we need it?
+    3. HOW does it help the heap/problem?
+
+Use the fully annotated 01_min_max_heap_basics.c as the reference style.

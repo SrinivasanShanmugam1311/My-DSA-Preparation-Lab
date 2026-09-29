@@ -1,0 +1,104 @@
+REUSABLE HEAP FUNCTIONS — ULTRA SIMPLE GUIDE
+============================================
+
+WHY REUSE FUNCTIONS?
+--------------------
+The 25 problems look different, but many repeat the same heap actions.
+
+    candidate becomes useful
+            ↓
+          PUSH
+            ↓
+    best candidate is at root
+            ↓
+       READ or POP
+            ↓
+       state changes
+            ↓
+          repeat
+
+Do NOT memorize 25 unrelated solutions.
+Recognize which heap action the problem needs.
+
+============================================================
+A. REUSABLE MIN-HEAP OPERATIONS
+============================================================
+
+min_heap_push / min_push
+    Meaning: "This candidate is now allowed. Put it in the waiting room."
+
+min_heap_pop / min_pop
+    Meaning: "Give me the SMALLEST current candidate."
+
+min_heap_root / min_root
+    Meaning: "Show me the SMALLEST candidate, but do not remove it."
+
+Common problems:
+    Top K Largest       -> root = weakest/smallest Top-K winner
+    Kth Largest         -> root = Kth largest after keeping K winners
+    K-Sorted Array      -> pop smallest nearby candidate
+    Merge K Lists       -> pop smallest current list head
+    Hand of Straights   -> smallest remaining card starts next group
+    Kth Largest Stream  -> root = Kth largest
+    Connect Sticks      -> pop two smallest sticks
+    Single-Threaded CPU -> smallest processing-time available task
+
+============================================================
+B. REUSABLE MAX-HEAP OPERATIONS
+============================================================
+
+max_heap_push / max_push
+    Meaning: "This candidate is now allowed. Put it in the waiting room."
+
+max_heap_pop / max_pop
+    Meaning: "Give me the LARGEST current candidate."
+
+max_heap_root / max_root
+    Meaning: "Show me the LARGEST candidate, but do not remove it."
+
+Common problems:
+    Top K Smallest      -> root = farthest/largest current winner
+    Task Scheduler      -> pop highest remaining frequency among READY tasks
+    Design Twitter      -> pop newest timestamp
+    Last Stone Weight   -> pop two largest stones
+    K Closest Points    -> root = farthest current winner
+    Maximum Sum Combo   -> pop largest discovered pair sum
+    IPO                  -> pop highest-profit affordable project
+
+============================================================
+C. TWO HEAPS
+============================================================
+
+Median From Data Stream
+
+    LEFT half                 RIGHT half
+    MAX HEAP                  MIN HEAP
+       ↓                         ↓
+ biggest small value       smallest big value
+          \                   /
+           \                 /
+              MEDIAN AREA
+
+============================================================
+D. DO NOT HIDE THE BASICS TOO EARLY
+============================================================
+
+For problems 01-06, study the internal code:
+
+    INSERT -> end -> bubble UP
+    DELETE -> last to root -> heapify DOWN
+
+For application problems 07-25, reusable helpers are useful because the
+interview focus is usually the PATTERN and STATE, not rewriting heap internals.
+
+============================================================
+E. ONE QUESTION TO ASK IN AN INTERVIEW
+============================================================
+
+"What must be easy to get repeatedly?"
+
+smallest repeatedly -> MIN HEAP
+largest repeatedly  -> MAX HEAP
+K largest winners   -> MIN HEAP size K
+K smallest winners  -> MAX HEAP size K
+median of stream    -> TWO HEAPS
