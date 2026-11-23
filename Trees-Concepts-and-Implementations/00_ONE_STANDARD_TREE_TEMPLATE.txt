@@ -1,0 +1,32 @@
+ONE STANDARD TREE TEMPLATE — CHOOSE THE PATTERN
+================================================
+Recursive DFS:
+    if root is null: return base answer
+    left = solve(root.left)
+    right = solve(root.right)
+    return combine(root, left, right)
+Use for height, balance and other bottom-up aggregates. Diameter also tracks the best path.
+
+Iterative DFS:
+    push root if present
+    while stack is not empty:
+        node = pop()
+        visit node
+        push right then left if present
+This is preorder; inorder/postorder need different stack logic.
+
+BFS:
+    enqueue root if present
+    while queue is not empty:
+        level_size = queue size
+        repeat level_size times:
+            node = dequeue()
+            visit node
+            enqueue existing children
+Use for levels, views and width (width needs indices).
+
+BST search:
+    while root exists and key differs:
+        choose left if key smaller, otherwise right
+    return root
+Assumes BST ordering. Do not use on arbitrary binary trees.

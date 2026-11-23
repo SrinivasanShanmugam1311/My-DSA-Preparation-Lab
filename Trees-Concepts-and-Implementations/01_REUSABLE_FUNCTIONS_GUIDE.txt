@@ -1,0 +1,12 @@
+REUSABLE FUNCTIONS — CONCEPT MAP
+================================
+New template names: height, preorder, level_order, search_bst.
+Simplified Python originals: height_recursive, preorder_recursive, level_order_iterative, search_bst_iterative.
+V3 diameter: height helper computes heights and updates diameter.
+V3 merge BSTs: inorder + merge sorted sequences.
+V3 delete BST: minimum helper + search + replacement.
+V3 width: BFS + positional indices.
+V3 serialize: preorder with null markers.
+V3 Morris: predecessor search and temporary links.
+V3 flatten: traversal plus link rewiring.
+Reuse concepts first. Do not substitute a generic helper blindly when a problem needs extra state or different return values.

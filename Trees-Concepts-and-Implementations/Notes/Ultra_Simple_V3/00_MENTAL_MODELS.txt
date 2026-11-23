@@ -1,0 +1,74 @@
+TREE V3 — ULTRA SIMPLE MENTAL MODELS
+=====================================
+
+01 LCA BST
+          6
+        /   \
+       2     8
+        \
+         4
+
+LCA(2,4):
+At 6 -> both smaller -> LEFT
+At 2 -> one target IS 2 / split happens -> answer 2
+
+
+02 MERGE TWO BSTs
+BST1 -> INORDER -> sorted A
+BST2 -> INORDER -> sorted B
+A + B -> normal two-pointer merge
+
+
+03 DELETE BST
+FIND NODE
+   |
+   +-- 0 child -> delete
+   +-- 1 child -> child replaces it
+   +-- 2 children -> take smallest from RIGHT
+
+
+04 BST FROM PREORDER
+preorder = ROOT, LEFT..., RIGHT...
+Give every recursive call a legal upper boundary.
+
+
+05 MORRIS
+Need to come back after visiting LEFT,
+but do not want a stack.
+Create a TEMPORARY ROAD back to current node.
+
+
+06 DIAMETER
+        NODE
+       /    \
+ left height right height
+
+left + right = path THROUGH this node.
+Return max(left,right)+1 upward.
+
+
+07 CHILDREN SUM
+Going DOWN  -> make children large enough.
+Coming UP   -> parent = left + right.
+
+
+08 WIDTH
+Give nodes imaginary array positions.
+Width = rightmost position - leftmost position + 1.
+
+
+09 SERIALIZATION
+Tree -> preorder string.
+NULL must also be written:
+1,2,#,#,3,#,#
+Those # symbols preserve shape.
+
+
+10 FLATTEN
+Wanted final order:
+ROOT -> LEFT -> RIGHT
+
+Process backwards:
+RIGHT -> LEFT -> ROOT
+
+Attach current.right to previously processed node.

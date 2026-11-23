@@ -1,0 +1,22 @@
+TREES — MENTAL MODELS
+=====================
+DFS: visit a node and its subtrees. Preorder = root first; inorder = root between children; postorder = root last.
+BFS: queue holds nodes waiting to be processed, one level at a time.
+Height: ask both children for height; return 1 + max(left, right), counting nodes.
+Diameter: each node offers left height + right height (edges); return height upward.
+Balance: both subtrees must be balanced and their heights differ by at most one.
+Same tree: compare current nodes and corresponding children.
+Symmetry: compare opposite children as mirror images.
+Views: BFS by level or horizontal distance; choose appropriate first/last nodes.
+Boundary: root + nonleaf left boundary + leaves + reversed nonleaf right boundary.
+Paths: carry state downward; undo path choices on return if using a shared path.
+LCA: general tree combines answers from children; BST follows ordering.
+Children sum: adjust values downward and repair parents on return (see original assumptions).
+Complete count: use perfect-subtree shortcut only for complete trees.
+Build tree: pick root from traversal and split inorder; unique values assumed in common reconstruction.
+Serialize: record structure including null children.
+Morris: temporarily thread predecessor links; restore them.
+Flatten: preserve preorder while rewiring links.
+BST: ordering guides search, insertion, deletion, floor and ceil; inorder gives sorted keys.
+Width: BFS positional indices account for missing slots.
+Ternary: visit all three child branches.

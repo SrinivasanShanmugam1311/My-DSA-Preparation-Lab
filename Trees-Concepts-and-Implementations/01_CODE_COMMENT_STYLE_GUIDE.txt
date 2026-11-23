@@ -1,0 +1,10 @@
+NEW CODE STYLE GUIDE
+====================
+WHAT: describe what the statement does.
+WHY: explain why the operation is needed.
+HOW: connect it to the tree pattern.
+Prefer one statement per line and meaningful names.
+Explain the base case and returned information for recursion.
+Explain stack or queue state for iteration.
+State assumptions, complexity and whether links are modified.
+These rules apply to new templates only. Original comments remain untouched.

@@ -1,0 +1,1852 @@
+BINARY TREE MASTER SHEET - PYTHON
+Simple logic, traversal categories, and frequently asked problems
+
+============================================================
+MASTER MAP
+============================================================
+
+PREORDER DFS:
+Current -> Left -> Right
+Use when current node works before children.
+Examples: Path Sum, Good Nodes, Invert Tree, Serialize.
+
+INORDER DFS:
+Left -> Current -> Right
+Use when BST sorted order is important.
+Examples: Kth Smallest, Recover BST.
+
+POSTORDER DFS:
+Left -> Right -> Current
+Use when parent needs child answers.
+Examples: Height, Diameter, Balanced Tree, LCA, Maximum Path Sum.
+
+BFS:
+Process one complete level at a time.
+Examples: Level Order, Zigzag, Views, Width, Minimum Depth.
+
+DOUBLE DFS:
+Compare two nodes or two trees together.
+Examples: Same Tree, Symmetric Tree, Subtree.
+
+BST SINGLE PATH:
+Use BST ordering and visit only one path.
+Examples: Search, Insert, Delete, Floor, Ceil, LCA in BST.
+
+============================================================
+COMMON DEFINITIONS
+============================================================
+
+from collections import deque
+from math import inf
+
+
+class TreeNode:
+    def __init__(self, value):
+        self.val = value
+        self.left = None
+        self.right = None
+
+
+def is_leaf(node):
+    if node is None:
+        return False
+
+    if node.left is not None:
+        return False
+
+    if node.right is not None:
+        return False
+
+    return True
+
+============================================================
+1. BASIC TRAVERSALS
+============================================================
+
+def preorder(root):
+    if root is None:
+        return
+
+    print(root.val, end=" ")
+
+    preorder(root.left)
+
+    preorder(root.right)
+
+
+def inorder(root):
+    if root is None:
+        return
+
+    inorder(root.left)
+
+    print(root.val, end=" ")
+
+    inorder(root.right)
+
+
+def postorder(root):
+    if root is None:
+        return
+
+    postorder(root.left)
+
+    postorder(root.right)
+
+    print(root.val, end=" ")
+
+============================================================
+2. HEIGHT - POSTORDER
+============================================================
+
+Problem:
+Find the longest root-to-leaf height.
+
+Logic:
+Ask left.
+Ask right.
+Take the bigger one.
+Add 1 for current node.
+
+def tree_height(root):
+    if root is None:
+        return 0
+
+    left_height = tree_height(root.left)
+
+    right_height = tree_height(root.right)
+
+    bigger_height = max(
+        left_height,
+        right_height
+    )
+
+    return 1 + bigger_height
+
+============================================================
+3. DIAMETER - POSTORDER
+============================================================
+
+Problem:
+Find the longest path between any two nodes.
+
+Logic change from height:
+Path through current node = left height + right height.
+
+def diameter(root):
+    best_diameter = 0
+
+    def height(node):
+        nonlocal best_diameter
+
+        if node is None:
+            return 0
+
+        left_height = height(node.left)
+
+        right_height = height(node.right)
+
+        path_through_current = (
+            left_height
+            + right_height
+        )
+
+        best_diameter = max(
+            best_diameter,
+            path_through_current
+        )
+
+        current_height = 1 + max(
+            left_height,
+            right_height
+        )
+
+        return current_height
+
+    height(root)
+
+    return best_diameter
+
+============================================================
+4. BALANCED TREE - POSTORDER
+============================================================
+
+def is_balanced(root):
+    def height(node):
+        if node is None:
+            return 0
+
+        left_height = height(node.left)
+
+        if left_height == -1:
+            return -1
+
+        right_height = height(node.right)
+
+        if right_height == -1:
+            return -1
+
+        difference = abs(
+            left_height
+            - right_height
+        )
+
+        if difference > 1:
+            return -1
+
+        return 1 + max(
+            left_height,
+            right_height
+        )
+
+    result = height(root)
+
+    return result != -1
+
+============================================================
+5. SAME TREE - DOUBLE DFS
+============================================================
+
+def same_tree(first, second):
+    if first is None and second is None:
+        return True
+
+    if first is None or second is None:
+        return False
+
+    if first.val != second.val:
+        return False
+
+    left_same = same_tree(
+        first.left,
+        second.left
+    )
+
+    right_same = same_tree(
+        first.right,
+        second.right
+    )
+
+    return left_same and right_same
+
+============================================================
+6. SYMMETRIC TREE - DOUBLE DFS / MIRROR
+============================================================
+
+def is_symmetric(root):
+    if root is None:
+        return True
+
+    def mirror(left_node, right_node):
+        if left_node is None and right_node is None:
+            return True
+
+        if left_node is None or right_node is None:
+            return False
+
+        if left_node.val != right_node.val:
+            return False
+
+        outside_same = mirror(
+            left_node.left,
+            right_node.right
+        )
+
+        inside_same = mirror(
+            left_node.right,
+            right_node.left
+        )
+
+        return outside_same and inside_same
+
+    return mirror(
+        root.left,
+        root.right
+    )
+
+============================================================
+7. SUBTREE - DOUBLE DFS
+============================================================
+
+def is_subtree(root, subroot):
+    if subroot is None:
+        return True
+
+    if root is None:
+        return False
+
+    if same_tree(root, subroot):
+        return True
+
+    found_left = is_subtree(
+        root.left,
+        subroot
+    )
+
+    if found_left:
+        return True
+
+    found_right = is_subtree(
+        root.right,
+        subroot
+    )
+
+    return found_right
+
+============================================================
+8. LEVEL ORDER - BFS
+============================================================
+
+def level_order(root):
+    if root is None:
+        return []
+
+    queue = deque([root])
+    answer = []
+
+    while queue:
+        level_size = len(queue)
+        level = []
+
+        for index in range(level_size):
+            node = queue.popleft()
+
+            level.append(node.val)
+
+            if node.left is not None:
+                queue.append(node.left)
+
+            if node.right is not None:
+                queue.append(node.right)
+
+        answer.append(level)
+
+    return answer
+
+============================================================
+9. ZIGZAG - BFS
+============================================================
+
+def zigzag(root):
+    if root is None:
+        return []
+
+    queue = deque([root])
+    answer = []
+    left_to_right = True
+
+    while queue:
+        level_size = len(queue)
+        level = []
+
+        for index in range(level_size):
+            node = queue.popleft()
+
+            level.append(node.val)
+
+            if node.left is not None:
+                queue.append(node.left)
+
+            if node.right is not None:
+                queue.append(node.right)
+
+        if not left_to_right:
+            level.reverse()
+
+        answer.append(level)
+
+        left_to_right = not left_to_right
+
+    return answer
+
+============================================================
+10. LEFT VIEW - BFS
+============================================================
+
+def left_view(root):
+    if root is None:
+        return []
+
+    queue = deque([root])
+    answer = []
+
+    while queue:
+        level_size = len(queue)
+
+        for index in range(level_size):
+            node = queue.popleft()
+
+            if index == 0:
+                answer.append(node.val)
+
+            if node.left is not None:
+                queue.append(node.left)
+
+            if node.right is not None:
+                queue.append(node.right)
+
+    return answer
+
+============================================================
+11. RIGHT VIEW - BFS
+============================================================
+
+def right_view(root):
+    if root is None:
+        return []
+
+    queue = deque([root])
+    answer = []
+
+    while queue:
+        level_size = len(queue)
+
+        for index in range(level_size):
+            node = queue.popleft()
+
+            if index == level_size - 1:
+                answer.append(node.val)
+
+            if node.left is not None:
+                queue.append(node.left)
+
+            if node.right is not None:
+                queue.append(node.right)
+
+    return answer
+
+============================================================
+12. ROOT-TO-LEAF PATHS - PREORDER + BACKTRACKING
+============================================================
+
+def root_to_leaf_paths(root):
+    answer = []
+    path = []
+
+    def dfs(node):
+        if node is None:
+            return
+
+        path.append(node.val)
+
+        if is_leaf(node):
+            answer.append(path.copy())
+        else:
+            dfs(node.left)
+
+            dfs(node.right)
+
+        path.pop()
+
+    dfs(root)
+
+    return answer
+
+============================================================
+13. HAS PATH SUM - PREORDER / CARRY DOWNWARD
+============================================================
+
+def has_path_sum(root, target):
+    if root is None:
+        return False
+
+    remaining = target - root.val
+
+    if is_leaf(root):
+        return remaining == 0
+
+    left_result = has_path_sum(
+        root.left,
+        remaining
+    )
+
+    if left_result:
+        return True
+
+    right_result = has_path_sum(
+        root.right,
+        remaining
+    )
+
+    return right_result
+
+============================================================
+14. GOOD NODES - PREORDER / CARRY DOWNWARD
+============================================================
+
+def count_good_nodes(root):
+    if root is None:
+        return 0
+
+    def dfs(node, maximum_seen):
+        if node is None:
+            return 0
+
+        current_is_good = 0
+
+        if node.val >= maximum_seen:
+            current_is_good = 1
+
+        new_maximum = max(
+            maximum_seen,
+            node.val
+        )
+
+        left_count = dfs(
+            node.left,
+            new_maximum
+        )
+
+        right_count = dfs(
+            node.right,
+            new_maximum
+        )
+
+        return (
+            current_is_good
+            + left_count
+            + right_count
+        )
+
+    return dfs(
+        root,
+        root.val
+    )
+
+============================================================
+15. LCA IN BINARY TREE - POSTORDER
+============================================================
+
+def lca_binary_tree(root, first, second):
+    if root is None:
+        return None
+
+    if root is first:
+        return root
+
+    if root is second:
+        return root
+
+    left_answer = lca_binary_tree(
+        root.left,
+        first,
+        second
+    )
+
+    right_answer = lca_binary_tree(
+        root.right,
+        first,
+        second
+    )
+
+    if left_answer is not None and right_answer is not None:
+        return root
+
+    if left_answer is not None:
+        return left_answer
+
+    return right_answer
+
+============================================================
+16. INVERT TREE - PREORDER
+============================================================
+
+def invert_tree(root):
+    if root is None:
+        return None
+
+    temporary = root.left
+
+    root.left = root.right
+
+    root.right = temporary
+
+    invert_tree(root.left)
+
+    invert_tree(root.right)
+
+    return root
+
+============================================================
+17. MAXIMUM WIDTH - BFS WITH POSITIONS
+============================================================
+
+def maximum_width(root):
+    if root is None:
+        return 0
+
+    queue = deque([(root, 0)])
+    best_width = 0
+
+    while queue:
+        level_size = len(queue)
+
+        base_position = queue[0][1]
+
+        first = 0
+        last = 0
+
+        for index in range(level_size):
+            node, position = queue.popleft()
+
+            position = (
+                position
+                - base_position
+            )
+
+            if index == 0:
+                first = position
+
+            if index == level_size - 1:
+                last = position
+
+            if node.left is not None:
+                left_position = (
+                    2 * position
+                    + 1
+                )
+
+                queue.append(
+                    (node.left, left_position)
+                )
+
+            if node.right is not None:
+                right_position = (
+                    2 * position
+                    + 2
+                )
+
+                queue.append(
+                    (node.right, right_position)
+                )
+
+        current_width = (
+            last
+            - first
+            + 1
+        )
+
+        best_width = max(
+            best_width,
+            current_width
+        )
+
+    return best_width
+
+============================================================
+18. COUNT COMPLETE TREE NODES
+============================================================
+
+def leftmost_height(root):
+    height = 0
+
+    while root is not None:
+        height += 1
+        root = root.left
+
+    return height
+
+
+def rightmost_height(root):
+    height = 0
+
+    while root is not None:
+        height += 1
+        root = root.right
+
+    return height
+
+
+def count_complete_nodes(root):
+    if root is None:
+        return 0
+
+    left_height = leftmost_height(root)
+
+    right_height = rightmost_height(root)
+
+    if left_height == right_height:
+        return (
+            2 ** left_height
+            - 1
+        )
+
+    left_count = count_complete_nodes(
+        root.left
+    )
+
+    right_count = count_complete_nodes(
+        root.right
+    )
+
+    return (
+        1
+        + left_count
+        + right_count
+    )
+
+============================================================
+19. BST SEARCH - SINGLE PATH
+============================================================
+
+def search_bst(root, value):
+    if root is None:
+        return None
+
+    if root.val == value:
+        return root
+
+    if value < root.val:
+        return search_bst(
+            root.left,
+            value
+        )
+
+    return search_bst(
+        root.right,
+        value
+    )
+
+============================================================
+20. BST INSERT - SINGLE PATH
+============================================================
+
+def insert_bst(root, value):
+    if root is None:
+        return TreeNode(value)
+
+    if value < root.val:
+        new_left = insert_bst(
+            root.left,
+            value
+        )
+
+        root.left = new_left
+
+    elif value > root.val:
+        new_right = insert_bst(
+            root.right,
+            value
+        )
+
+        root.right = new_right
+
+    return root
+
+============================================================
+21. FLOOR AND CEIL - BST SINGLE PATH
+============================================================
+
+def bst_floor(root, target):
+    answer = None
+
+    while root is not None:
+        if root.val == target:
+            return root.val
+
+        if root.val < target:
+            answer = root.val
+            root = root.right
+        else:
+            root = root.left
+
+    return answer
+
+
+def bst_ceil(root, target):
+    answer = None
+
+    while root is not None:
+        if root.val == target:
+            return root.val
+
+        if root.val > target:
+            answer = root.val
+            root = root.left
+        else:
+            root = root.right
+
+    return answer
+
+============================================================
+22. VALIDATE BST - PREORDER / RANGE
+============================================================
+
+def is_valid_bst(root):
+    def validate(node, minimum, maximum):
+        if node is None:
+            return True
+
+        if node.val <= minimum:
+            return False
+
+        if node.val >= maximum:
+            return False
+
+        left_ok = validate(
+            node.left,
+            minimum,
+            node.val
+        )
+
+        if not left_ok:
+            return False
+
+        right_ok = validate(
+            node.right,
+            node.val,
+            maximum
+        )
+
+        return right_ok
+
+    return validate(
+        root,
+        -inf,
+        inf
+    )
+
+============================================================
+23. KTH SMALLEST - INORDER
+============================================================
+
+def kth_smallest(root, k):
+    count = 0
+    answer = None
+
+    def search(node):
+        nonlocal count
+        nonlocal answer
+
+        if node is None:
+            return
+
+        if answer is not None:
+            return
+
+        search(node.left)
+
+        if answer is not None:
+            return
+
+        count += 1
+
+        if count == k:
+            answer = node.val
+            return
+
+        search(node.right)
+
+    search(root)
+
+    return answer
+
+============================================================
+24. LCA IN BST - SINGLE PATH
+============================================================
+
+def lca_bst(root, first, second):
+    while root is not None:
+        both_smaller = (
+            first.val < root.val
+            and second.val < root.val
+        )
+
+        if both_smaller:
+            root = root.left
+            continue
+
+        both_larger = (
+            first.val > root.val
+            and second.val > root.val
+        )
+
+        if both_larger:
+            root = root.right
+            continue
+
+        return root
+
+    return None
+
+============================================================
+25. BST DELETE
+============================================================
+
+def minimum_node(root):
+    while root is not None and root.left is not None:
+        root = root.left
+
+    return root
+
+
+def delete_bst(root, value):
+    if root is None:
+        return None
+
+    if value < root.val:
+        new_left = delete_bst(
+            root.left,
+            value
+        )
+
+        root.left = new_left
+
+        return root
+
+    if value > root.val:
+        new_right = delete_bst(
+            root.right,
+            value
+        )
+
+        root.right = new_right
+
+        return root
+
+    if root.left is None:
+        return root.right
+
+    if root.right is None:
+        return root.left
+
+    successor = minimum_node(
+        root.right
+    )
+
+    root.val = successor.val
+
+    new_right = delete_bst(
+        root.right,
+        successor.val
+    )
+
+    root.right = new_right
+
+    return root
+
+============================================================
+26. MAXIMUM PATH SUM - POSTORDER / TREE DP
+============================================================
+
+def maximum_path_sum(root):
+    best_answer = -inf
+
+    def maximum_gain(node):
+        nonlocal best_answer
+
+        if node is None:
+            return 0
+
+        left_gain = maximum_gain(
+            node.left
+        )
+
+        right_gain = maximum_gain(
+            node.right
+        )
+
+        if left_gain < 0:
+            left_gain = 0
+
+        if right_gain < 0:
+            right_gain = 0
+
+        complete_path = (
+            node.val
+            + left_gain
+            + right_gain
+        )
+
+        best_answer = max(
+            best_answer,
+            complete_path
+        )
+
+        better_child = max(
+            left_gain,
+            right_gain
+        )
+
+        return (
+            node.val
+            + better_child
+        )
+
+    maximum_gain(root)
+
+    return best_answer
+
+============================================================
+27. MINIMUM DEPTH - BFS
+============================================================
+
+def minimum_depth(root):
+    if root is None:
+        return 0
+
+    queue = deque([
+        (root, 1)
+    ])
+
+    while queue:
+        node, depth = queue.popleft()
+
+        if is_leaf(node):
+            return depth
+
+        if node.left is not None:
+            queue.append(
+                (node.left, depth + 1)
+            )
+
+        if node.right is not None:
+            queue.append(
+                (node.right, depth + 1)
+            )
+
+    return 0
+
+============================================================
+28. CHILDREN SUM PROPERTY
+============================================================
+
+def change_children_sum(root):
+    if root is None:
+        return
+
+    child_sum = 0
+
+    if root.left is not None:
+        child_sum += root.left.val
+
+    if root.right is not None:
+        child_sum += root.right.val
+
+    if child_sum >= root.val:
+        root.val = child_sum
+    else:
+        if root.left is not None:
+            root.left.val = root.val
+
+        if root.right is not None:
+            root.right.val = root.val
+
+    change_children_sum(
+        root.left
+    )
+
+    change_children_sum(
+        root.right
+    )
+
+    final_sum = 0
+
+    if root.left is not None:
+        final_sum += root.left.val
+
+    if root.right is not None:
+        final_sum += root.right.val
+
+    if not is_leaf(root):
+        root.val = final_sum
+
+============================================================
+29. BUILD TREE FROM PREORDER + INORDER
+============================================================
+
+def build_pre_in(preorder_values, inorder_values):
+    index_map = {}
+
+    for index, value in enumerate(inorder_values):
+        index_map[value] = index
+
+    preorder_index = 0
+
+    def build(left, right):
+        nonlocal preorder_index
+
+        if left > right:
+            return None
+
+        root_value = preorder_values[
+            preorder_index
+        ]
+
+        preorder_index += 1
+
+        root = TreeNode(root_value)
+
+        middle = index_map[
+            root_value
+        ]
+
+        root.left = build(
+            left,
+            middle - 1
+        )
+
+        root.right = build(
+            middle + 1,
+            right
+        )
+
+        return root
+
+    return build(
+        0,
+        len(inorder_values) - 1
+    )
+
+============================================================
+30. BUILD TREE FROM POSTORDER + INORDER
+============================================================
+
+Important logic change:
+Read postorder backward.
+Build right first.
+Build left second.
+
+def build_post_in(postorder_values, inorder_values):
+    index_map = {}
+
+    for index, value in enumerate(inorder_values):
+        index_map[value] = index
+
+    postorder_index = (
+        len(postorder_values)
+        - 1
+    )
+
+    def build(left, right):
+        nonlocal postorder_index
+
+        if left > right:
+            return None
+
+        root_value = postorder_values[
+            postorder_index
+        ]
+
+        postorder_index -= 1
+
+        root = TreeNode(root_value)
+
+        middle = index_map[
+            root_value
+        ]
+
+        root.right = build(
+            middle + 1,
+            right
+        )
+
+        root.left = build(
+            left,
+            middle - 1
+        )
+
+        return root
+
+    return build(
+        0,
+        len(inorder_values) - 1
+    )
+
+============================================================
+31. SERIALIZE - PREORDER DFS
+============================================================
+
+def serialize_tree(root):
+    values = []
+
+    def dfs(node):
+        if node is None:
+            values.append("#")
+            return
+
+        values.append(
+            str(node.val)
+        )
+
+        dfs(node.left)
+
+        dfs(node.right)
+
+    dfs(root)
+
+    return ",".join(values)
+
+============================================================
+32. DESERIALIZE - PREORDER DFS
+============================================================
+
+def deserialize_tree(data):
+    values = iter(
+        data.split(",")
+    )
+
+    def build():
+        value = next(values)
+
+        if value == "#":
+            return None
+
+        root = TreeNode(
+            int(value)
+        )
+
+        root.left = build()
+
+        root.right = build()
+
+        return root
+
+    return build()
+
+============================================================
+33. FLATTEN TREE - REVERSE PREORDER
+============================================================
+
+def flatten_tree(root):
+    previous = None
+
+    def dfs(node):
+        nonlocal previous
+
+        if node is None:
+            return
+
+        dfs(node.right)
+
+        dfs(node.left)
+
+        node.right = previous
+
+        node.left = None
+
+        previous = node
+
+    dfs(root)
+
+============================================================
+MASTER TECHNIQUES
+============================================================
+
+Carry downward:
+Path Sum, Good Nodes, Validate BST range.
+
+Return upward:
+Height, Diameter, Balanced Tree, LCA, Maximum Path Sum.
+
+Backtracking:
+Add choice, recurse, remove choice.
+
+Double DFS:
+Same Tree, Symmetric Tree, Subtree.
+
+BFS level:
+Read level size and process exactly one level.
+
+BST single path:
+Current node chooses only left or right.
+
+Tree DP:
+Children return states.
+Parent combines them.
+
+Build tree:
+One traversal gives root.
+Inorder splits left and right.
+
+Serialize and deserialize:
+Use exactly the same traversal order.
+
+============================================================
+34. VERTICAL ORDER - BFS + HORIZONTAL DISTANCE
+============================================================
+
+def vertical_order(root):
+    if root is None:
+        return []
+
+    queue = deque([
+        (root, 0)
+    ])
+
+    columns = {}
+
+    while queue:
+        node, distance = queue.popleft()
+
+        if distance not in columns:
+            columns[distance] = []
+
+        columns[distance].append(
+            node.val
+        )
+
+        if node.left is not None:
+            queue.append(
+                (node.left, distance - 1)
+            )
+
+        if node.right is not None:
+            queue.append(
+                (node.right, distance + 1)
+            )
+
+    answer = []
+
+    for distance in sorted(columns):
+        answer.append(
+            columns[distance]
+        )
+
+    return answer
+
+============================================================
+35. TOP VIEW - BFS + FIRST NODE
+============================================================
+
+def top_view(root):
+    if root is None:
+        return []
+
+    queue = deque([
+        (root, 0)
+    ])
+
+    first_node = {}
+
+    while queue:
+        node, distance = queue.popleft()
+
+        if distance not in first_node:
+            first_node[distance] = node.val
+
+        if node.left is not None:
+            queue.append(
+                (node.left, distance - 1)
+            )
+
+        if node.right is not None:
+            queue.append(
+                (node.right, distance + 1)
+            )
+
+    answer = []
+
+    for distance in sorted(first_node):
+        answer.append(
+            first_node[distance]
+        )
+
+    return answer
+
+============================================================
+36. BOTTOM VIEW - BFS + LATEST NODE
+============================================================
+
+def bottom_view(root):
+    if root is None:
+        return []
+
+    queue = deque([
+        (root, 0)
+    ])
+
+    latest_node = {}
+
+    while queue:
+        node, distance = queue.popleft()
+
+        latest_node[distance] = node.val
+
+        if node.left is not None:
+            queue.append(
+                (node.left, distance - 1)
+            )
+
+        if node.right is not None:
+            queue.append(
+                (node.right, distance + 1)
+            )
+
+    answer = []
+
+    for distance in sorted(latest_node):
+        answer.append(
+            latest_node[distance]
+        )
+
+    return answer
+
+============================================================
+37. BOUNDARY TRAVERSAL - MIXED DFS
+============================================================
+
+def boundary_traversal(root):
+    if root is None:
+        return []
+
+    answer = []
+
+    if not is_leaf(root):
+        answer.append(root.val)
+
+    node = root.left
+
+    while node is not None:
+        if not is_leaf(node):
+            answer.append(node.val)
+
+        if node.left is not None:
+            node = node.left
+        else:
+            node = node.right
+
+    def add_leaves(current):
+        if current is None:
+            return
+
+        if is_leaf(current):
+            answer.append(current.val)
+            return
+
+        add_leaves(current.left)
+
+        add_leaves(current.right)
+
+    add_leaves(root)
+
+    right_values = []
+
+    node = root.right
+
+    while node is not None:
+        if not is_leaf(node):
+            right_values.append(node.val)
+
+        if node.right is not None:
+            node = node.right
+        else:
+            node = node.left
+
+    right_values.reverse()
+
+    answer.extend(right_values)
+
+    return answer
+
+============================================================
+38. RECOVER BST - INORDER
+============================================================
+
+def recover_bst(root):
+    first_wrong = None
+    second_wrong = None
+    previous = None
+
+    def inorder_scan(node):
+        nonlocal first_wrong
+        nonlocal second_wrong
+        nonlocal previous
+
+        if node is None:
+            return
+
+        inorder_scan(node.left)
+
+        if previous is not None:
+            if previous.val > node.val:
+                if first_wrong is None:
+                    first_wrong = previous
+
+                second_wrong = node
+
+        previous = node
+
+        inorder_scan(node.right)
+
+    inorder_scan(root)
+
+    if first_wrong is not None:
+        temporary = first_wrong.val
+
+        first_wrong.val = second_wrong.val
+
+        second_wrong.val = temporary
+
+============================================================
+39. HOUSE ROBBER III - POSTORDER / TREE DP
+============================================================
+
+def house_robber_three(root):
+    def solve(node):
+        if node is None:
+            return (0, 0)
+
+        left_rob, left_skip = solve(
+            node.left
+        )
+
+        right_rob, right_skip = solve(
+            node.right
+        )
+
+        rob_current = (
+            node.val
+            + left_skip
+            + right_skip
+        )
+
+        skip_current = (
+            max(left_rob, left_skip)
+            + max(right_rob, right_skip)
+        )
+
+        return (
+            rob_current,
+            skip_current
+        )
+
+    rob_root, skip_root = solve(root)
+
+    return max(
+        rob_root,
+        skip_root
+    )
+
+============================================================
+40. BINARY TREE CAMERAS - POSTORDER / STATE
+============================================================
+
+def minimum_cameras(root):
+    camera_count = 0
+
+    NEEDS_CAMERA = 0
+    HAS_CAMERA = 1
+    COVERED = 2
+
+    def state(node):
+        nonlocal camera_count
+
+        if node is None:
+            return COVERED
+
+        left_state = state(node.left)
+
+        right_state = state(node.right)
+
+        if (
+            left_state == NEEDS_CAMERA
+            or right_state == NEEDS_CAMERA
+        ):
+            camera_count += 1
+            return HAS_CAMERA
+
+        if (
+            left_state == HAS_CAMERA
+            or right_state == HAS_CAMERA
+        ):
+            return COVERED
+
+        return NEEDS_CAMERA
+
+    root_state = state(root)
+
+    if root_state == NEEDS_CAMERA:
+        camera_count += 1
+
+    return camera_count
+
+============================================================
+41. LARGEST BST SUBTREE - POSTORDER / TREE DP
+============================================================
+
+def largest_bst_subtree(root):
+    largest_size = 0
+
+    def solve(node):
+        nonlocal largest_size
+
+        if node is None:
+            return (
+                True,
+                inf,
+                -inf,
+                0
+            )
+
+        (
+            left_is_bst,
+            left_minimum,
+            left_maximum,
+            left_size
+        ) = solve(node.left)
+
+        (
+            right_is_bst,
+            right_minimum,
+            right_maximum,
+            right_size
+        ) = solve(node.right)
+
+        current_is_bst = (
+            left_is_bst
+            and right_is_bst
+            and node.val > left_maximum
+            and node.val < right_minimum
+        )
+
+        if current_is_bst:
+            current_size = (
+                1
+                + left_size
+                + right_size
+            )
+
+            largest_size = max(
+                largest_size,
+                current_size
+            )
+
+            current_minimum = min(
+                left_minimum,
+                node.val
+            )
+
+            current_maximum = max(
+                right_maximum,
+                node.val
+            )
+
+            return (
+                True,
+                current_minimum,
+                current_maximum,
+                current_size
+            )
+
+        return (
+            False,
+            -inf,
+            inf,
+            0
+        )
+
+    solve(root)
+
+    return largest_size
+
+# ============================================================
+# STRIVER APPENDIX — MISSING IMPORTANT PROBLEMS
+# ============================================================
+
+# 42. ITERATIVE PREORDER — STACK
+def iterative_preorder(root):
+    if root is None:
+        return []
+
+    stack = [root]
+    answer = []
+
+    while stack:
+        node = stack.pop()
+
+        answer.append(node.val)
+
+        if node.right is not None:
+            stack.append(node.right)
+
+        if node.left is not None:
+            stack.append(node.left)
+
+    return answer
+
+
+# 43. ITERATIVE INORDER — STACK
+def iterative_inorder(root):
+    stack = []
+    answer = []
+
+    node = root
+
+    while node is not None or stack:
+        while node is not None:
+            stack.append(node)
+            node = node.left
+
+        node = stack.pop()
+
+        answer.append(node.val)
+
+        node = node.right
+
+    return answer
+
+
+# 44. ITERATIVE POSTORDER — TWO STACKS
+def iterative_postorder_two_stacks(root):
+    if root is None:
+        return []
+
+    first_stack = [root]
+    second_stack = []
+
+    while first_stack:
+        node = first_stack.pop()
+
+        second_stack.append(node)
+
+        if node.left is not None:
+            first_stack.append(node.left)
+
+        if node.right is not None:
+            first_stack.append(node.right)
+
+    answer = []
+
+    while second_stack:
+        node = second_stack.pop()
+
+        answer.append(node.val)
+
+    return answer
+
+
+# 45. MORRIS INORDER
+def morris_inorder(root):
+    answer = []
+    current = root
+
+    while current is not None:
+        if current.left is None:
+            answer.append(current.val)
+            current = current.right
+        else:
+            predecessor = current.left
+
+            while (
+                predecessor.right is not None
+                and predecessor.right is not current
+            ):
+                predecessor = predecessor.right
+
+            if predecessor.right is None:
+                predecessor.right = current
+                current = current.left
+            else:
+                predecessor.right = None
+                answer.append(current.val)
+                current = current.right
+
+    return answer
+
+
+# 46. MORRIS PREORDER
+def morris_preorder(root):
+    answer = []
+    current = root
+
+    while current is not None:
+        if current.left is None:
+            answer.append(current.val)
+            current = current.right
+        else:
+            predecessor = current.left
+
+            while (
+                predecessor.right is not None
+                and predecessor.right is not current
+            ):
+                predecessor = predecessor.right
+
+            if predecessor.right is None:
+                answer.append(current.val)
+                predecessor.right = current
+                current = current.left
+            else:
+                predecessor.right = None
+                current = current.right
+
+    return answer
+
+
+# 47. BST MINIMUM
+def bst_minimum(root):
+    if root is None:
+        return None
+
+    while root.left is not None:
+        root = root.left
+
+    return root
+
+
+# 48. BST MAXIMUM
+def bst_maximum(root):
+    if root is None:
+        return None
+
+    while root.right is not None:
+        root = root.right
+
+    return root
+
+
+# 49. INORDER SUCCESSOR
+def bst_successor(root, value):
+    answer = None
+
+    while root is not None:
+        if value < root.val:
+            answer = root
+            root = root.left
+        else:
+            root = root.right
+
+    return answer
+
+
+# 50. INORDER PREDECESSOR
+def bst_predecessor(root, value):
+    answer = None
+
+    while root is not None:
+        if value > root.val:
+            answer = root
+            root = root.right
+        else:
+            root = root.left
+
+    return answer
+
+
+# 51. CONSTRUCT BST FROM PREORDER
+def build_bst_from_preorder(preorder_values):
+    index = 0
+
+    def build(upper_limit):
+        nonlocal index
+
+        if index >= len(preorder_values):
+            return None
+
+        value = preorder_values[index]
+
+        if value >= upper_limit:
+            return None
+
+        root = TreeNode(value)
+
+        index += 1
+
+        root.left = build(value)
+
+        root.right = build(upper_limit)
+
+        return root
+
+    return build(inf)

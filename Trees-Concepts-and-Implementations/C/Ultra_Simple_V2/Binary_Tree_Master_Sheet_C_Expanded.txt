@@ -1,0 +1,2268 @@
+BINARY TREE MASTER SHEET - C
+Simple logic, traversal categories, and frequently asked problems
+
+============================================================
+MASTER MAP
+============================================================
+
+PREORDER DFS:
+Current -> Left -> Right
+Use when current node works before children.
+Examples: Path Sum, Good Nodes, Invert Tree, Serialize.
+
+INORDER DFS:
+Left -> Current -> Right
+Use when BST sorted order is important.
+Examples: Kth Smallest, Recover BST.
+
+POSTORDER DFS:
+Left -> Right -> Current
+Use when parent needs child answers.
+Examples: Height, Diameter, Balanced Tree, LCA, Maximum Path Sum.
+
+BFS:
+Process one complete level at a time.
+Examples: Level Order, Zigzag, Views, Width, Minimum Depth.
+
+DOUBLE DFS:
+Compare two nodes or two trees together.
+Examples: Same Tree, Symmetric Tree, Subtree.
+
+BST SINGLE PATH:
+Use BST ordering and visit only one path.
+Examples: Search, Insert, Delete, Floor, Ceil, LCA in BST.
+
+============================================================
+COMMON DEFINITIONS
+============================================================
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAXN 10000
+#define SERIAL_BUFFER 100000
+
+typedef struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+} TreeNode;
+
+typedef struct QueueItem {
+    TreeNode *node;
+    long long position;
+} QueueItem;
+
+int max2(int first, int second)
+{
+    if (first > second)
+        return first;
+
+    return second;
+}
+
+TreeNode *create_node(int value)
+{
+    TreeNode *node = malloc(sizeof(TreeNode));
+
+    if (node == NULL)
+        return NULL;
+
+    node->val = value;
+    node->left = NULL;
+    node->right = NULL;
+
+    return node;
+}
+
+int is_leaf(TreeNode *node)
+{
+    if (node == NULL)
+        return 0;
+
+    if (node->left != NULL)
+        return 0;
+
+    if (node->right != NULL)
+        return 0;
+
+    return 1;
+}
+
+============================================================
+1. BASIC TRAVERSALS
+============================================================
+
+void preorder(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    printf("%d ", root->val);
+
+    preorder(root->left);
+
+    preorder(root->right);
+}
+
+void inorder(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    inorder(root->left);
+
+    printf("%d ", root->val);
+
+    inorder(root->right);
+}
+
+void postorder(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    postorder(root->left);
+
+    postorder(root->right);
+
+    printf("%d ", root->val);
+}
+
+============================================================
+2. HEIGHT - POSTORDER
+============================================================
+
+Problem:
+Find the longest root-to-leaf height.
+
+Logic:
+Ask left.
+Ask right.
+Take the bigger one.
+Add 1 for current node.
+
+int tree_height(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int left_height = tree_height(root->left);
+
+    int right_height = tree_height(root->right);
+
+    int bigger_height = max2(left_height, right_height);
+
+    return 1 + bigger_height;
+}
+
+============================================================
+3. DIAMETER - POSTORDER
+============================================================
+
+Problem:
+Find the longest path between any two nodes.
+
+Logic change from height:
+Path through current node = left height + right height.
+
+int diameter_answer = 0;
+
+int height_for_diameter(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int left_height = height_for_diameter(root->left);
+
+    int right_height = height_for_diameter(root->right);
+
+    int path_through_current = left_height + right_height;
+
+    if (path_through_current > diameter_answer)
+        diameter_answer = path_through_current;
+
+    return 1 + max2(left_height, right_height);
+}
+
+int diameter(TreeNode *root)
+{
+    diameter_answer = 0;
+
+    height_for_diameter(root);
+
+    return diameter_answer;
+}
+
+============================================================
+4. BALANCED TREE - POSTORDER
+============================================================
+
+Problem:
+At every node, left and right heights differ by at most 1.
+
+Logic:
+Return -1 immediately when a subtree is unbalanced.
+
+int balanced_height(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int left_height = balanced_height(root->left);
+
+    if (left_height == -1)
+        return -1;
+
+    int right_height = balanced_height(root->right);
+
+    if (right_height == -1)
+        return -1;
+
+    int difference = left_height - right_height;
+
+    if (difference < 0)
+        difference = -difference;
+
+    if (difference > 1)
+        return -1;
+
+    return 1 + max2(left_height, right_height);
+}
+
+int is_balanced(TreeNode *root)
+{
+    int result = balanced_height(root);
+
+    if (result == -1)
+        return 0;
+
+    return 1;
+}
+
+============================================================
+5. SAME TREE - DOUBLE DFS
+============================================================
+
+int same_tree(TreeNode *first, TreeNode *second)
+{
+    if (first == NULL && second == NULL)
+        return 1;
+
+    if (first == NULL || second == NULL)
+        return 0;
+
+    if (first->val != second->val)
+        return 0;
+
+    int left_same = same_tree(
+        first->left,
+        second->left);
+
+    int right_same = same_tree(
+        first->right,
+        second->right);
+
+    return left_same && right_same;
+}
+
+============================================================
+6. SYMMETRIC TREE - DOUBLE DFS / MIRROR
+============================================================
+
+int mirror(TreeNode *left_node, TreeNode *right_node)
+{
+    if (left_node == NULL && right_node == NULL)
+        return 1;
+
+    if (left_node == NULL || right_node == NULL)
+        return 0;
+
+    if (left_node->val != right_node->val)
+        return 0;
+
+    int outside_same = mirror(
+        left_node->left,
+        right_node->right);
+
+    int inside_same = mirror(
+        left_node->right,
+        right_node->left);
+
+    return outside_same && inside_same;
+}
+
+int is_symmetric(TreeNode *root)
+{
+    if (root == NULL)
+        return 1;
+
+    return mirror(root->left, root->right);
+}
+
+============================================================
+7. SUBTREE - DOUBLE DFS
+============================================================
+
+int is_subtree(TreeNode *root, TreeNode *subroot)
+{
+    if (subroot == NULL)
+        return 1;
+
+    if (root == NULL)
+        return 0;
+
+    if (same_tree(root, subroot))
+        return 1;
+
+    int found_left = is_subtree(root->left, subroot);
+
+    if (found_left)
+        return 1;
+
+    int found_right = is_subtree(root->right, subroot);
+
+    return found_right;
+}
+
+============================================================
+8. LEVEL ORDER - BFS
+============================================================
+
+void level_order(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    TreeNode *queue[MAXN];
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear] = root;
+    rear++;
+
+    while (front < rear) {
+        int level_size = rear - front;
+
+        for (int index = 0; index < level_size; index++) {
+            TreeNode *node = queue[front];
+            front++;
+
+            printf("%d ", node->val);
+
+            if (node->left != NULL) {
+                queue[rear] = node->left;
+                rear++;
+            }
+
+            if (node->right != NULL) {
+                queue[rear] = node->right;
+                rear++;
+            }
+        }
+
+        printf("\n");
+    }
+}
+
+============================================================
+9. ZIGZAG - BFS
+============================================================
+
+Only logic change:
+Store one level.
+Reverse alternate levels.
+
+void zigzag(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    TreeNode *queue[MAXN];
+    int level_values[MAXN];
+
+    int front = 0;
+    int rear = 0;
+    int left_to_right = 1;
+
+    queue[rear] = root;
+    rear++;
+
+    while (front < rear) {
+        int level_size = rear - front;
+
+        for (int index = 0; index < level_size; index++) {
+            TreeNode *node = queue[front];
+            front++;
+
+            level_values[index] = node->val;
+
+            if (node->left != NULL) {
+                queue[rear] = node->left;
+                rear++;
+            }
+
+            if (node->right != NULL) {
+                queue[rear] = node->right;
+                rear++;
+            }
+        }
+
+        if (left_to_right) {
+            for (int index = 0; index < level_size; index++)
+                printf("%d ", level_values[index]);
+        } else {
+            for (int index = level_size - 1; index >= 0; index--)
+                printf("%d ", level_values[index]);
+        }
+
+        printf("\n");
+
+        left_to_right = !left_to_right;
+    }
+}
+
+============================================================
+10. LEFT VIEW - BFS
+============================================================
+
+Only logic change:
+First node of level means index == 0.
+
+void left_view(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    TreeNode *queue[MAXN];
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear] = root;
+    rear++;
+
+    while (front < rear) {
+        int level_size = rear - front;
+
+        for (int index = 0; index < level_size; index++) {
+            TreeNode *node = queue[front];
+            front++;
+
+            if (index == 0)
+                printf("%d ", node->val);
+
+            if (node->left != NULL) {
+                queue[rear] = node->left;
+                rear++;
+            }
+
+            if (node->right != NULL) {
+                queue[rear] = node->right;
+                rear++;
+            }
+        }
+    }
+}
+
+============================================================
+11. RIGHT VIEW - BFS
+============================================================
+
+Only logic change:
+Last node means index == level_size - 1.
+
+void right_view(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    TreeNode *queue[MAXN];
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear] = root;
+    rear++;
+
+    while (front < rear) {
+        int level_size = rear - front;
+
+        for (int index = 0; index < level_size; index++) {
+            TreeNode *node = queue[front];
+            front++;
+
+            if (index == level_size - 1)
+                printf("%d ", node->val);
+
+            if (node->left != NULL) {
+                queue[rear] = node->left;
+                rear++;
+            }
+
+            if (node->right != NULL) {
+                queue[rear] = node->right;
+                rear++;
+            }
+        }
+    }
+}
+
+============================================================
+12. ROOT-TO-LEAF PATHS - PREORDER + BACKTRACKING
+============================================================
+
+void print_path(int path[], int length)
+{
+    for (int index = 0; index < length; index++)
+        printf("%d ", path[index]);
+
+    printf("\n");
+}
+
+void paths_helper(
+    TreeNode *root,
+    int path[],
+    int length)
+{
+    if (root == NULL)
+        return;
+
+    path[length] = root->val;
+    length++;
+
+    if (is_leaf(root)) {
+        print_path(path, length);
+        return;
+    }
+
+    paths_helper(
+        root->left,
+        path,
+        length);
+
+    paths_helper(
+        root->right,
+        path,
+        length);
+}
+
+void root_to_leaf_paths(TreeNode *root)
+{
+    int path[MAXN];
+
+    paths_helper(root, path, 0);
+}
+
+============================================================
+13. HAS PATH SUM - PREORDER / CARRY DOWNWARD
+============================================================
+
+int has_path_sum(TreeNode *root, int target)
+{
+    if (root == NULL)
+        return 0;
+
+    int remaining = target - root->val;
+
+    if (is_leaf(root))
+        return remaining == 0;
+
+    int left_result = has_path_sum(
+        root->left,
+        remaining);
+
+    if (left_result)
+        return 1;
+
+    int right_result = has_path_sum(
+        root->right,
+        remaining);
+
+    return right_result;
+}
+
+============================================================
+14. GOOD NODES - PREORDER / CARRY DOWNWARD
+============================================================
+
+int good_nodes_helper(TreeNode *root, int maximum_seen)
+{
+    if (root == NULL)
+        return 0;
+
+    int current_is_good = 0;
+
+    if (root->val >= maximum_seen)
+        current_is_good = 1;
+
+    int new_maximum = maximum_seen;
+
+    if (root->val > new_maximum)
+        new_maximum = root->val;
+
+    int left_count = good_nodes_helper(
+        root->left,
+        new_maximum);
+
+    int right_count = good_nodes_helper(
+        root->right,
+        new_maximum);
+
+    return current_is_good + left_count + right_count;
+}
+
+int count_good_nodes(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    return good_nodes_helper(root, root->val);
+}
+
+============================================================
+15. LCA IN BINARY TREE - POSTORDER
+============================================================
+
+TreeNode *lca_binary_tree(
+    TreeNode *root,
+    TreeNode *first,
+    TreeNode *second)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (root == first)
+        return root;
+
+    if (root == second)
+        return root;
+
+    TreeNode *left_answer = lca_binary_tree(
+        root->left,
+        first,
+        second);
+
+    TreeNode *right_answer = lca_binary_tree(
+        root->right,
+        first,
+        second);
+
+    if (left_answer != NULL && right_answer != NULL)
+        return root;
+
+    if (left_answer != NULL)
+        return left_answer;
+
+    return right_answer;
+}
+
+============================================================
+16. INVERT TREE - PREORDER
+============================================================
+
+TreeNode *invert_tree(TreeNode *root)
+{
+    if (root == NULL)
+        return NULL;
+
+    TreeNode *temporary = root->left;
+
+    root->left = root->right;
+
+    root->right = temporary;
+
+    invert_tree(root->left);
+
+    invert_tree(root->right);
+
+    return root;
+}
+
+============================================================
+17. MAXIMUM WIDTH - BFS WITH POSITIONS
+============================================================
+
+long long maximum_width(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    QueueItem queue[MAXN];
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear].node = root;
+    queue[rear].position = 0;
+    rear++;
+
+    long long best_width = 0;
+
+    while (front < rear) {
+        int level_size = rear - front;
+
+        long long base_position = queue[front].position;
+
+        long long first = 0;
+        long long last = 0;
+
+        for (int index = 0; index < level_size; index++) {
+            QueueItem item = queue[front];
+            front++;
+
+            TreeNode *node = item.node;
+
+            long long position =
+                item.position - base_position;
+
+            if (index == 0)
+                first = position;
+
+            if (index == level_size - 1)
+                last = position;
+
+            if (node->left != NULL) {
+                queue[rear].node = node->left;
+                queue[rear].position =
+                    2 * position + 1;
+                rear++;
+            }
+
+            if (node->right != NULL) {
+                queue[rear].node = node->right;
+                queue[rear].position =
+                    2 * position + 2;
+                rear++;
+            }
+        }
+
+        long long current_width =
+            last - first + 1;
+
+        if (current_width > best_width)
+            best_width = current_width;
+    }
+
+    return best_width;
+}
+
+============================================================
+18. COUNT COMPLETE TREE NODES
+============================================================
+
+int leftmost_height(TreeNode *root)
+{
+    int height = 0;
+
+    while (root != NULL) {
+        height++;
+        root = root->left;
+    }
+
+    return height;
+}
+
+int rightmost_height(TreeNode *root)
+{
+    int height = 0;
+
+    while (root != NULL) {
+        height++;
+        root = root->right;
+    }
+
+    return height;
+}
+
+int count_complete_nodes(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int left_height = leftmost_height(root);
+
+    int right_height = rightmost_height(root);
+
+    if (left_height == right_height)
+        return (1 << left_height) - 1;
+
+    int left_count = count_complete_nodes(root->left);
+
+    int right_count = count_complete_nodes(root->right);
+
+    return 1 + left_count + right_count;
+}
+
+============================================================
+19. BST SEARCH - SINGLE PATH
+============================================================
+
+TreeNode *search_bst(TreeNode *root, int value)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (root->val == value)
+        return root;
+
+    if (value < root->val)
+        return search_bst(root->left, value);
+
+    return search_bst(root->right, value);
+}
+
+============================================================
+20. BST INSERT - SINGLE PATH
+============================================================
+
+TreeNode *insert_bst(TreeNode *root, int value)
+{
+    if (root == NULL)
+        return create_node(value);
+
+    if (value < root->val) {
+        TreeNode *new_left = insert_bst(
+            root->left,
+            value);
+
+        root->left = new_left;
+    } else if (value > root->val) {
+        TreeNode *new_right = insert_bst(
+            root->right,
+            value);
+
+        root->right = new_right;
+    }
+
+    return root;
+}
+
+============================================================
+21. FLOOR AND CEIL - BST SINGLE PATH
+============================================================
+
+int bst_floor(TreeNode *root, int target, int *found)
+{
+    int answer = 0;
+
+    *found = 0;
+
+    while (root != NULL) {
+        if (root->val == target) {
+            *found = 1;
+            return root->val;
+        }
+
+        if (root->val < target) {
+            answer = root->val;
+            *found = 1;
+            root = root->right;
+        } else {
+            root = root->left;
+        }
+    }
+
+    return answer;
+}
+
+int bst_ceil(TreeNode *root, int target, int *found)
+{
+    int answer = 0;
+
+    *found = 0;
+
+    while (root != NULL) {
+        if (root->val == target) {
+            *found = 1;
+            return root->val;
+        }
+
+        if (root->val > target) {
+            answer = root->val;
+            *found = 1;
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+
+    return answer;
+}
+
+============================================================
+22. VALIDATE BST - PREORDER / RANGE
+============================================================
+
+int validate_bst(
+    TreeNode *root,
+    long minimum,
+    long maximum)
+{
+    if (root == NULL)
+        return 1;
+
+    if (root->val <= minimum)
+        return 0;
+
+    if (root->val >= maximum)
+        return 0;
+
+    int left_ok = validate_bst(
+        root->left,
+        minimum,
+        root->val);
+
+    if (!left_ok)
+        return 0;
+
+    int right_ok = validate_bst(
+        root->right,
+        root->val,
+        maximum);
+
+    return right_ok;
+}
+
+int is_valid_bst(TreeNode *root)
+{
+    return validate_bst(
+        root,
+        LONG_MIN,
+        LONG_MAX);
+}
+
+============================================================
+23. KTH SMALLEST - INORDER
+============================================================
+
+void kth_helper(
+    TreeNode *root,
+    int k,
+    int *count,
+    int *answer,
+    int *found)
+{
+    if (root == NULL)
+        return;
+
+    if (*found)
+        return;
+
+    kth_helper(
+        root->left,
+        k,
+        count,
+        answer,
+        found);
+
+    if (*found)
+        return;
+
+    (*count)++;
+
+    if (*count == k) {
+        *answer = root->val;
+        *found = 1;
+        return;
+    }
+
+    kth_helper(
+        root->right,
+        k,
+        count,
+        answer,
+        found);
+}
+
+int kth_smallest(TreeNode *root, int k, int *found)
+{
+    int count = 0;
+    int answer = 0;
+
+    *found = 0;
+
+    kth_helper(
+        root,
+        k,
+        &count,
+        &answer,
+        found);
+
+    return answer;
+}
+
+============================================================
+24. LCA IN BST - SINGLE PATH
+============================================================
+
+TreeNode *lca_bst(
+    TreeNode *root,
+    TreeNode *first,
+    TreeNode *second)
+{
+    while (root != NULL) {
+        if (first->val < root->val &&
+            second->val < root->val) {
+            root = root->left;
+            continue;
+        }
+
+        if (first->val > root->val &&
+            second->val > root->val) {
+            root = root->right;
+            continue;
+        }
+
+        return root;
+    }
+
+    return NULL;
+}
+
+============================================================
+25. BST DELETE
+============================================================
+
+TreeNode *minimum_node(TreeNode *root)
+{
+    while (root != NULL && root->left != NULL)
+        root = root->left;
+
+    return root;
+}
+
+TreeNode *delete_bst(TreeNode *root, int value)
+{
+    if (root == NULL)
+        return NULL;
+
+    if (value < root->val) {
+        root->left = delete_bst(
+            root->left,
+            value);
+
+        return root;
+    }
+
+    if (value > root->val) {
+        root->right = delete_bst(
+            root->right,
+            value);
+
+        return root;
+    }
+
+    if (root->left == NULL) {
+        TreeNode *right_child = root->right;
+
+        free(root);
+
+        return right_child;
+    }
+
+    if (root->right == NULL) {
+        TreeNode *left_child = root->left;
+
+        free(root);
+
+        return left_child;
+    }
+
+    TreeNode *successor = minimum_node(root->right);
+
+    root->val = successor->val;
+
+    root->right = delete_bst(
+        root->right,
+        successor->val);
+
+    return root;
+}
+
+============================================================
+26. MAXIMUM PATH SUM - POSTORDER / TREE DP
+============================================================
+
+int maximum_path_answer = INT_MIN;
+
+int maximum_gain(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int left_gain = maximum_gain(root->left);
+
+    int right_gain = maximum_gain(root->right);
+
+    if (left_gain < 0)
+        left_gain = 0;
+
+    if (right_gain < 0)
+        right_gain = 0;
+
+    int complete_path =
+        root->val + left_gain + right_gain;
+
+    if (complete_path > maximum_path_answer)
+        maximum_path_answer = complete_path;
+
+    int better_child = max2(
+        left_gain,
+        right_gain);
+
+    return root->val + better_child;
+}
+
+int maximum_path_sum(TreeNode *root)
+{
+    maximum_path_answer = INT_MIN;
+
+    maximum_gain(root);
+
+    return maximum_path_answer;
+}
+
+============================================================
+27. MINIMUM DEPTH - BFS
+============================================================
+
+int minimum_depth(TreeNode *root)
+{
+    if (root == NULL)
+        return 0;
+
+    TreeNode *queue[MAXN];
+    int depth_queue[MAXN];
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear] = root;
+    depth_queue[rear] = 1;
+    rear++;
+
+    while (front < rear) {
+        TreeNode *node = queue[front];
+        int depth = depth_queue[front];
+        front++;
+
+        if (is_leaf(node))
+            return depth;
+
+        if (node->left != NULL) {
+            queue[rear] = node->left;
+            depth_queue[rear] = depth + 1;
+            rear++;
+        }
+
+        if (node->right != NULL) {
+            queue[rear] = node->right;
+            depth_queue[rear] = depth + 1;
+            rear++;
+        }
+    }
+
+    return 0;
+}
+
+============================================================
+28. CHILDREN SUM PROPERTY
+============================================================
+
+void change_children_sum(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    int child_sum = 0;
+
+    if (root->left != NULL)
+        child_sum += root->left->val;
+
+    if (root->right != NULL)
+        child_sum += root->right->val;
+
+    if (child_sum >= root->val) {
+        root->val = child_sum;
+    } else {
+        if (root->left != NULL)
+            root->left->val = root->val;
+
+        if (root->right != NULL)
+            root->right->val = root->val;
+    }
+
+    change_children_sum(root->left);
+
+    change_children_sum(root->right);
+
+    int final_sum = 0;
+
+    if (root->left != NULL)
+        final_sum += root->left->val;
+
+    if (root->right != NULL)
+        final_sum += root->right->val;
+
+    if (!is_leaf(root))
+        root->val = final_sum;
+}
+
+============================================================
+29. BUILD TREE FROM PREORDER + INORDER
+============================================================
+
+int find_index(
+    int inorder_values[],
+    int left,
+    int right,
+    int value)
+{
+    for (int index = left; index <= right; index++) {
+        if (inorder_values[index] == value)
+            return index;
+    }
+
+    return -1;
+}
+
+TreeNode *build_pre_in_helper(
+    int preorder_values[],
+    int *preorder_index,
+    int inorder_values[],
+    int left,
+    int right)
+{
+    if (left > right)
+        return NULL;
+
+    int root_value =
+        preorder_values[*preorder_index];
+
+    (*preorder_index)++;
+
+    TreeNode *root = create_node(root_value);
+
+    int middle = find_index(
+        inorder_values,
+        left,
+        right,
+        root_value);
+
+    root->left = build_pre_in_helper(
+        preorder_values,
+        preorder_index,
+        inorder_values,
+        left,
+        middle - 1);
+
+    root->right = build_pre_in_helper(
+        preorder_values,
+        preorder_index,
+        inorder_values,
+        middle + 1,
+        right);
+
+    return root;
+}
+
+TreeNode *build_pre_in(
+    int preorder_values[],
+    int inorder_values[],
+    int size)
+{
+    int preorder_index = 0;
+
+    return build_pre_in_helper(
+        preorder_values,
+        &preorder_index,
+        inorder_values,
+        0,
+        size - 1);
+}
+
+============================================================
+30. BUILD TREE FROM POSTORDER + INORDER
+============================================================
+
+Important logic change:
+Reading postorder backward gives Root -> Right -> Left.
+Therefore build right first.
+
+TreeNode *build_post_in_helper(
+    int postorder_values[],
+    int *postorder_index,
+    int inorder_values[],
+    int left,
+    int right)
+{
+    if (left > right)
+        return NULL;
+
+    int root_value =
+        postorder_values[*postorder_index];
+
+    (*postorder_index)--;
+
+    TreeNode *root = create_node(root_value);
+
+    int middle = find_index(
+        inorder_values,
+        left,
+        right,
+        root_value);
+
+    root->right = build_post_in_helper(
+        postorder_values,
+        postorder_index,
+        inorder_values,
+        middle + 1,
+        right);
+
+    root->left = build_post_in_helper(
+        postorder_values,
+        postorder_index,
+        inorder_values,
+        left,
+        middle - 1);
+
+    return root;
+}
+
+TreeNode *build_post_in(
+    int postorder_values[],
+    int inorder_values[],
+    int size)
+{
+    int postorder_index = size - 1;
+
+    return build_post_in_helper(
+        postorder_values,
+        &postorder_index,
+        inorder_values,
+        0,
+        size - 1);
+}
+
+============================================================
+31. SERIALIZE - PREORDER DFS
+============================================================
+
+void serialize_helper(
+    TreeNode *root,
+    char buffer[],
+    int *position)
+{
+    if (root == NULL) {
+        int written = sprintf(
+            buffer + *position,
+            "#,");
+
+        *position += written;
+
+        return;
+    }
+
+    int written = sprintf(
+        buffer + *position,
+        "%d,",
+        root->val);
+
+    *position += written;
+
+    serialize_helper(
+        root->left,
+        buffer,
+        position);
+
+    serialize_helper(
+        root->right,
+        buffer,
+        position);
+}
+
+void serialize_tree(TreeNode *root, char buffer[])
+{
+    int position = 0;
+
+    serialize_helper(
+        root,
+        buffer,
+        &position);
+
+    buffer[position] = '\0';
+}
+
+============================================================
+32. DESERIALIZE - PREORDER DFS
+============================================================
+
+TreeNode *deserialize_helper(char **text)
+{
+    if (**text == '#') {
+        *text = *text + 2;
+
+        return NULL;
+    }
+
+    int sign = 1;
+    int value = 0;
+
+    if (**text == '-') {
+        sign = -1;
+        (*text)++;
+    }
+
+    while (**text != ',' && **text != '\0') {
+        value = value * 10 + (**text - '0');
+        (*text)++;
+    }
+
+    value = value * sign;
+
+    if (**text == ',')
+        (*text)++;
+
+    TreeNode *root = create_node(value);
+
+    root->left = deserialize_helper(text);
+
+    root->right = deserialize_helper(text);
+
+    return root;
+}
+
+TreeNode *deserialize_tree(char buffer[])
+{
+    char *text = buffer;
+
+    return deserialize_helper(&text);
+}
+
+============================================================
+33. FLATTEN TREE - REVERSE PREORDER
+============================================================
+
+TreeNode *previous_flatten_node = NULL;
+
+void flatten_helper(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    flatten_helper(root->right);
+
+    flatten_helper(root->left);
+
+    root->right = previous_flatten_node;
+
+    root->left = NULL;
+
+    previous_flatten_node = root;
+}
+
+void flatten_tree(TreeNode *root)
+{
+    previous_flatten_node = NULL;
+
+    flatten_helper(root);
+}
+
+============================================================
+MASTER TECHNIQUES
+============================================================
+
+Carry downward:
+Path Sum, Good Nodes, Validate BST range.
+
+Return upward:
+Height, Diameter, Balanced Tree, LCA, Maximum Path Sum.
+
+Backtracking:
+Add choice, recurse, remove choice.
+
+Double DFS:
+Same Tree, Symmetric Tree, Subtree.
+
+BFS level:
+Read level size and process exactly one level.
+
+BST single path:
+Current node chooses only left or right.
+
+Tree DP:
+Children return states.
+Parent combines them.
+
+Build tree:
+One traversal gives root.
+Inorder splits left and right.
+
+Serialize and deserialize:
+Use exactly the same traversal order.
+
+============================================================
+34. VERTICAL ORDER - BFS + HORIZONTAL DISTANCE
+============================================================
+
+Problem:
+Group nodes by vertical column.
+
+Logic:
+Root distance = 0.
+Left child = distance - 1.
+Right child = distance + 1.
+Store all nodes for each distance.
+
+Note:
+For simple notes, this prints distance with node values.
+A production version may use a map or sorted structure.
+
+typedef struct HDItem {
+    TreeNode *node;
+    int distance;
+} HDItem;
+
+void vertical_order(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    HDItem queue[MAXN];
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear].node = root;
+    queue[rear].distance = 0;
+    rear++;
+
+    while (front < rear) {
+        HDItem item = queue[front];
+        front++;
+
+        printf("HD %d -> %d\n",
+               item.distance,
+               item.node->val);
+
+        if (item.node->left != NULL) {
+            queue[rear].node = item.node->left;
+            queue[rear].distance =
+                item.distance - 1;
+            rear++;
+        }
+
+        if (item.node->right != NULL) {
+            queue[rear].node = item.node->right;
+            queue[rear].distance =
+                item.distance + 1;
+            rear++;
+        }
+    }
+}
+
+============================================================
+35. TOP VIEW - BFS + FIRST NODE AT EACH DISTANCE
+============================================================
+
+Core logic:
+Store only the first node seen for every horizontal distance.
+
+typedef struct ViewEntry {
+    int used;
+    int value;
+} ViewEntry;
+
+void top_view(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    HDItem queue[MAXN];
+    ViewEntry view[2 * MAXN + 1] = {0};
+
+    int offset = MAXN;
+    int minimum_distance = 0;
+    int maximum_distance = 0;
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear].node = root;
+    queue[rear].distance = 0;
+    rear++;
+
+    while (front < rear) {
+        HDItem item = queue[front];
+        front++;
+
+        int index = item.distance + offset;
+
+        if (!view[index].used) {
+            view[index].used = 1;
+            view[index].value = item.node->val;
+        }
+
+        if (item.distance < minimum_distance)
+            minimum_distance = item.distance;
+
+        if (item.distance > maximum_distance)
+            maximum_distance = item.distance;
+
+        if (item.node->left != NULL) {
+            queue[rear].node = item.node->left;
+            queue[rear].distance =
+                item.distance - 1;
+            rear++;
+        }
+
+        if (item.node->right != NULL) {
+            queue[rear].node = item.node->right;
+            queue[rear].distance =
+                item.distance + 1;
+            rear++;
+        }
+    }
+
+    for (int distance = minimum_distance;
+         distance <= maximum_distance;
+         distance++) {
+        int index = distance + offset;
+
+        if (view[index].used)
+            printf("%d ", view[index].value);
+    }
+}
+
+============================================================
+36. BOTTOM VIEW - BFS + LATEST NODE AT EACH DISTANCE
+============================================================
+
+Core logic:
+Always replace the value for the distance.
+The lower node is processed later.
+
+void bottom_view(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    HDItem queue[MAXN];
+    ViewEntry view[2 * MAXN + 1] = {0};
+
+    int offset = MAXN;
+    int minimum_distance = 0;
+    int maximum_distance = 0;
+
+    int front = 0;
+    int rear = 0;
+
+    queue[rear].node = root;
+    queue[rear].distance = 0;
+    rear++;
+
+    while (front < rear) {
+        HDItem item = queue[front];
+        front++;
+
+        int index = item.distance + offset;
+
+        view[index].used = 1;
+        view[index].value = item.node->val;
+
+        if (item.distance < minimum_distance)
+            minimum_distance = item.distance;
+
+        if (item.distance > maximum_distance)
+            maximum_distance = item.distance;
+
+        if (item.node->left != NULL) {
+            queue[rear].node = item.node->left;
+            queue[rear].distance =
+                item.distance - 1;
+            rear++;
+        }
+
+        if (item.node->right != NULL) {
+            queue[rear].node = item.node->right;
+            queue[rear].distance =
+                item.distance + 1;
+            rear++;
+        }
+    }
+
+    for (int distance = minimum_distance;
+         distance <= maximum_distance;
+         distance++) {
+        int index = distance + offset;
+
+        if (view[index].used)
+            printf("%d ", view[index].value);
+    }
+}
+
+============================================================
+37. BOUNDARY TRAVERSAL - MIXED DFS
+============================================================
+
+Order:
+Root.
+Left boundary.
+Leaves.
+Right boundary in reverse.
+
+void add_left_boundary(TreeNode *root)
+{
+    TreeNode *node = root->left;
+
+    while (node != NULL) {
+        if (!is_leaf(node))
+            printf("%d ", node->val);
+
+        if (node->left != NULL)
+            node = node->left;
+        else
+            node = node->right;
+    }
+}
+
+void add_leaves(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    if (is_leaf(root)) {
+        printf("%d ", root->val);
+        return;
+    }
+
+    add_leaves(root->left);
+
+    add_leaves(root->right);
+}
+
+void add_right_boundary(TreeNode *root)
+{
+    int values[MAXN];
+    int count = 0;
+
+    TreeNode *node = root->right;
+
+    while (node != NULL) {
+        if (!is_leaf(node)) {
+            values[count] = node->val;
+            count++;
+        }
+
+        if (node->right != NULL)
+            node = node->right;
+        else
+            node = node->left;
+    }
+
+    for (int index = count - 1;
+         index >= 0;
+         index--)
+        printf("%d ", values[index]);
+}
+
+void boundary_traversal(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    if (!is_leaf(root))
+        printf("%d ", root->val);
+
+    add_left_boundary(root);
+
+    add_leaves(root);
+
+    add_right_boundary(root);
+}
+
+============================================================
+38. RECOVER BST - INORDER
+============================================================
+
+Problem:
+Two BST node values were swapped.
+
+Core logic:
+Inorder should be sorted.
+Find places where previous value is greater than current value.
+Swap the two wrong nodes.
+
+TreeNode *recover_first = NULL;
+TreeNode *recover_second = NULL;
+TreeNode *recover_previous = NULL;
+
+void recover_bst_helper(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    recover_bst_helper(root->left);
+
+    if (recover_previous != NULL &&
+        recover_previous->val > root->val) {
+        if (recover_first == NULL)
+            recover_first = recover_previous;
+
+        recover_second = root;
+    }
+
+    recover_previous = root;
+
+    recover_bst_helper(root->right);
+}
+
+void recover_bst(TreeNode *root)
+{
+    recover_first = NULL;
+    recover_second = NULL;
+    recover_previous = NULL;
+
+    recover_bst_helper(root);
+
+    if (recover_first != NULL &&
+        recover_second != NULL) {
+        int temporary = recover_first->val;
+
+        recover_first->val = recover_second->val;
+
+        recover_second->val = temporary;
+    }
+}
+
+============================================================
+39. HOUSE ROBBER III - POSTORDER / TREE DP
+============================================================
+
+Each node returns two values:
+rob_this_node.
+skip_this_node.
+
+typedef struct RobResult {
+    int rob;
+    int skip;
+} RobResult;
+
+RobResult rob_tree_helper(TreeNode *root)
+{
+    RobResult result;
+
+    if (root == NULL) {
+        result.rob = 0;
+        result.skip = 0;
+        return result;
+    }
+
+    RobResult left = rob_tree_helper(root->left);
+
+    RobResult right = rob_tree_helper(root->right);
+
+    result.rob =
+        root->val
+        + left.skip
+        + right.skip;
+
+    int best_left = max2(left.rob, left.skip);
+
+    int best_right = max2(right.rob, right.skip);
+
+    result.skip =
+        best_left
+        + best_right;
+
+    return result;
+}
+
+int house_robber_three(TreeNode *root)
+{
+    RobResult result = rob_tree_helper(root);
+
+    return max2(result.rob, result.skip);
+}
+
+============================================================
+40. BINARY TREE CAMERAS - POSTORDER / STATE
+============================================================
+
+States:
+0 = node needs camera.
+1 = node has camera.
+2 = node is covered.
+
+int camera_count = 0;
+
+int camera_state(TreeNode *root)
+{
+    if (root == NULL)
+        return 2;
+
+    int left_state = camera_state(root->left);
+
+    int right_state = camera_state(root->right);
+
+    if (left_state == 0 || right_state == 0) {
+        camera_count++;
+        return 1;
+    }
+
+    if (left_state == 1 || right_state == 1)
+        return 2;
+
+    return 0;
+}
+
+int minimum_cameras(TreeNode *root)
+{
+    camera_count = 0;
+
+    int root_state = camera_state(root);
+
+    if (root_state == 0)
+        camera_count++;
+
+    return camera_count;
+}
+
+============================================================
+41. LARGEST BST SUBTREE - POSTORDER / TREE DP
+============================================================
+
+Each child returns:
+Is subtree BST?
+Minimum value.
+Maximum value.
+Size.
+
+typedef struct BSTInfo {
+    int is_bst;
+    int minimum;
+    int maximum;
+    int size;
+} BSTInfo;
+
+int largest_bst_answer = 0;
+
+BSTInfo largest_bst_helper(TreeNode *root)
+{
+    BSTInfo result;
+
+    if (root == NULL) {
+        result.is_bst = 1;
+        result.minimum = INT_MAX;
+        result.maximum = INT_MIN;
+        result.size = 0;
+        return result;
+    }
+
+    BSTInfo left = largest_bst_helper(root->left);
+
+    BSTInfo right = largest_bst_helper(root->right);
+
+    int current_is_bst =
+        left.is_bst
+        && right.is_bst
+        && root->val > left.maximum
+        && root->val < right.minimum;
+
+    if (current_is_bst) {
+        result.is_bst = 1;
+        result.size =
+            1
+            + left.size
+            + right.size;
+
+        result.minimum = root->val;
+
+        if (left.minimum < result.minimum)
+            result.minimum = left.minimum;
+
+        result.maximum = root->val;
+
+        if (right.maximum > result.maximum)
+            result.maximum = right.maximum;
+
+        if (result.size > largest_bst_answer)
+            largest_bst_answer = result.size;
+
+        return result;
+    }
+
+    result.is_bst = 0;
+    result.minimum = INT_MIN;
+    result.maximum = INT_MAX;
+    result.size = 0;
+
+    return result;
+}
+
+int largest_bst_subtree(TreeNode *root)
+{
+    largest_bst_answer = 0;
+
+    largest_bst_helper(root);
+
+    return largest_bst_answer;
+}
+
+/* ============================================================
+ * STRIVER APPENDIX — MISSING IMPORTANT PROBLEMS
+ * ============================================================ */
+
+/* 42. ITERATIVE PREORDER — STACK
+ * Current -> Left -> Right
+ * Push right first.
+ * Push left second.
+ * Left is processed first because stack is LIFO.
+ */
+void iterative_preorder(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    TreeNode *stack[MAXN];
+    int top = -1;
+
+    stack[++top] = root;
+
+    while (top >= 0) {
+        TreeNode *node = stack[top--];
+
+        printf("%d ", node->val);
+
+        if (node->right != NULL)
+            stack[++top] = node->right;
+
+        if (node->left != NULL)
+            stack[++top] = node->left;
+    }
+}
+
+/* 43. ITERATIVE INORDER — STACK */
+void iterative_inorder(TreeNode *root)
+{
+    TreeNode *stack[MAXN];
+    int top = -1;
+
+    TreeNode *node = root;
+
+    while (node != NULL || top >= 0) {
+        while (node != NULL) {
+            stack[++top] = node;
+            node = node->left;
+        }
+
+        node = stack[top--];
+
+        printf("%d ", node->val);
+
+        node = node->right;
+    }
+}
+
+/* 44. ITERATIVE POSTORDER — TWO STACKS */
+void iterative_postorder_two_stacks(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    TreeNode *first_stack[MAXN];
+    TreeNode *second_stack[MAXN];
+
+    int first_top = -1;
+    int second_top = -1;
+
+    first_stack[++first_top] = root;
+
+    while (first_top >= 0) {
+        TreeNode *node = first_stack[first_top--];
+
+        second_stack[++second_top] = node;
+
+        if (node->left != NULL)
+            first_stack[++first_top] = node->left;
+
+        if (node->right != NULL)
+            first_stack[++first_top] = node->right;
+    }
+
+    while (second_top >= 0) {
+        TreeNode *node = second_stack[second_top--];
+
+        printf("%d ", node->val);
+    }
+}
+
+/* 45. MORRIS INORDER
+ * No recursion.
+ * No stack.
+ * Temporarily connect predecessor to current node.
+ */
+void morris_inorder(TreeNode *root)
+{
+    TreeNode *current = root;
+
+    while (current != NULL) {
+        if (current->left == NULL) {
+            printf("%d ", current->val);
+            current = current->right;
+        } else {
+            TreeNode *predecessor = current->left;
+
+            while (predecessor->right != NULL &&
+                   predecessor->right != current) {
+                predecessor = predecessor->right;
+            }
+
+            if (predecessor->right == NULL) {
+                predecessor->right = current;
+                current = current->left;
+            } else {
+                predecessor->right = NULL;
+                printf("%d ", current->val);
+                current = current->right;
+            }
+        }
+    }
+}
+
+/* 46. MORRIS PREORDER */
+void morris_preorder(TreeNode *root)
+{
+    TreeNode *current = root;
+
+    while (current != NULL) {
+        if (current->left == NULL) {
+            printf("%d ", current->val);
+            current = current->right;
+        } else {
+            TreeNode *predecessor = current->left;
+
+            while (predecessor->right != NULL &&
+                   predecessor->right != current) {
+                predecessor = predecessor->right;
+            }
+
+            if (predecessor->right == NULL) {
+                printf("%d ", current->val);
+                predecessor->right = current;
+                current = current->left;
+            } else {
+                predecessor->right = NULL;
+                current = current->right;
+            }
+        }
+    }
+}
+
+/* 47. BST MINIMUM */
+TreeNode *bst_minimum(TreeNode *root)
+{
+    if (root == NULL)
+        return NULL;
+
+    while (root->left != NULL)
+        root = root->left;
+
+    return root;
+}
+
+/* 48. BST MAXIMUM */
+TreeNode *bst_maximum(TreeNode *root)
+{
+    if (root == NULL)
+        return NULL;
+
+    while (root->right != NULL)
+        root = root->right;
+
+    return root;
+}
+
+/* 49. INORDER SUCCESSOR IN BST */
+TreeNode *bst_successor(TreeNode *root, int value)
+{
+    TreeNode *answer = NULL;
+
+    while (root != NULL) {
+        if (value < root->val) {
+            answer = root;
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+
+    return answer;
+}
+
+/* 50. INORDER PREDECESSOR IN BST */
+TreeNode *bst_predecessor(TreeNode *root, int value)
+{
+    TreeNode *answer = NULL;
+
+    while (root != NULL) {
+        if (value > root->val) {
+            answer = root;
+            root = root->right;
+        } else {
+            root = root->left;
+        }
+    }
+
+    return answer;
+}
+
+/* 51. CONSTRUCT BST FROM PREORDER USING RANGE */
+TreeNode *build_bst_preorder_helper(
+    int preorder_values[],
+    int size,
+    int *index,
+    long upper_limit)
+{
+    if (*index >= size)
+        return NULL;
+
+    int value = preorder_values[*index];
+
+    if (value >= upper_limit)
+        return NULL;
+
+    TreeNode *root = create_node(value);
+
+    (*index)++;
+
+    root->left = build_bst_preorder_helper(
+        preorder_values,
+        size,
+        index,
+        value);
+
+    root->right = build_bst_preorder_helper(
+        preorder_values,
+        size,
+        index,
+        upper_limit);
+
+    return root;
+}
+
+TreeNode *build_bst_from_preorder(
+    int preorder_values[],
+    int size)
+{
+    int index = 0;
+
+    return build_bst_preorder_helper(
+        preorder_values,
+        size,
+        &index,
+        LONG_MAX);
+}

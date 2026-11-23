@@ -1,0 +1,13 @@
+STANDARD VOCABULARY FOR NEW CODE
+================================
+root: subtree entry node
+node: current node
+left_height, right_height: subtree heights
+stack: pending DFS work
+queue: pending BFS work
+level_size: nodes in current level
+key: BST search target
+previous: previously visited node
+predecessor: rightmost node in left subtree (Morris)
+Use val for the new node type. Original files use val or data; keep them unchanged.
+Complexity: DFS O(n) time, O(h) recursive stack; explicit DFS stack O(h) for ordinary binary preorder; BFS O(n) time and O(w) queue space; BST search O(h) time, O(1) iterative space. h = height, w = maximum actual level size.
